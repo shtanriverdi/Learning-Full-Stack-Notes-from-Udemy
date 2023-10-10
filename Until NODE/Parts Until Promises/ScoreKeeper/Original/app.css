@@ -1,0 +1,48 @@
+html,
+body {
+    height: 100%;
+}
+
+h1 span {
+    transition: all 1s ease-out;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+/*     	align-items: center; */
+}
+
+#scoreBoardContainer {
+    padding: 3%;
+}
+
+#playerScores h1 {
+    display: inline;
+}
+
+#mainContainer {
+    margin-top: 5rem;
+    background-color: lightblue;
+
+    width: 40rem;
+    height: 40rem;
+    /*	This is for img to apply border-radius as well*/
+    overflow: hidden;
+    border-radius: 3%;
+    box-shadow: 0rem 0rem 0.5rem 0.01rem gray;
+    /*	display: flex;*/
+    /*	justify-content: center;
+	align-items: start;*/
+}
+
+#imageContainer {
+    width: 100%;
+    height: 20rem;
+}
+
+#imageContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

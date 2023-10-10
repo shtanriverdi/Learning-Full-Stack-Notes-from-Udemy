@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Score Keeper</title>
+    <link rel="stylesheet" href="bulma.min.css">
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+    <div class="columns is-half is-centered mt-6">
+        <div class="card">
+            <figure class="image is-16by9">
+                <img src="background.jpeg">
+            </figure>
+            <div class="card-content">
+                <div class="content">
+                    <h3 id="winner" class="is-size-3">Ping Pong Score Keeper</h3>
+                    <div id="playerScores">
+                        <h1>
+                            <span id="scoreP1">0</span>
+                            to
+                            <span id="scoreP2">0</span>
+                        </h1>
+                    </div>
+                    <p>Use the button below to keep scores.</p>
+                    <b class="title is-size-3">Playing To:</b>
+                    <div class="select is-rounded">
+                        <select id="pointSelection">
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <footer id="buttonsContainer" class="card-footer">
+                <button class="m-2 button card-footer-item is-success is-medium is-rounded" id="btnP1">+1 Player One</button>
+                <button class="m-2 button card-footer-item is-info is-medium is-rounded" id="btnP2">+1 Player Two</button>
+                <button class="m-2 button card-footer-item is-danger is-medium is-rounded" id="btnReset">Reset</button>
+            </footer>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
