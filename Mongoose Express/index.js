@@ -53,6 +53,14 @@ app.use(methodOverride('_method'));
 // Since Form cannot do PUT request, we use method override here
 // to convert/pretent default form method POST
 
+const categories = ['fruit', 'vegetable', 'dairy', 'fungi'];
+
+app.delete('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(id);
+    res.redirect(`/products`);
+});
+
 app.put('/products/:id', async (req, res) => {
     console.log(req.body, req.params);
     const { id } = req.params;
@@ -64,7 +72,7 @@ app.put('/products/:id', async (req, res) => {
 app.get('/products/:id/edit', async (req, res) => {
     const { id } = req.params;
     const product = await Product.findById(id);
-    res.render('products/edit', { product });
+    res.render('products/edit', { product, categories });
 });
 
 app.post('/products', async (req, res) => {
@@ -74,7 +82,7 @@ app.post('/products', async (req, res) => {
 });
 
 app.get('/products/new', (req, res) => {
-    res.render('products/new');
+    res.render('products/new', { categories });
 });
 
 app.get('/products/:id', async (req, res) => {
