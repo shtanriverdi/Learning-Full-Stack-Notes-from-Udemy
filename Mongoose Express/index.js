@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const Product = require('./models/product');
 const methodOverride = require('method-override');
 
-
 async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/farmStand');
     console.log('Mongo connection opened ✓');
@@ -93,14 +92,11 @@ app.get('/products/:id', async (req, res) => {
 
 app.get('/products', async (req, res) => {
     const { category } = req.query;
-    console.log(category);
-    console.log(typeof(category));
-    console.dir(category);
     let products;
     if (category) {
         products = await Product.find({ category });
     } else {
         products = await Product.find({});
     }
-    res.render('products/index', { products });
+    res.render('products/index', { products, category });
 });
