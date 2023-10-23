@@ -1,5 +1,9 @@
-/* One to Many Example
-    Two Collections are connecting
+/* One to Bajilions,
+    When we are working with thousands of objects,
+    instead of parent having IDs of its children,
+    we keep parent ID on the children.
+
+    One user has many tweets, one tweet belongs to one user
 */
 
 const mongoose = require('mongoose');
@@ -12,56 +16,43 @@ async function main() {
 
 main().catch(err => console.log("Mongo Error happened:", err));
 
-const productSchema = new Schema({
-    name: String,
-    price: Number,
-    season: {
-        type: String,
-        enum: ['Spring', 'Summer', 'Fall', 'Winter']
-    }
+const userSchema = new Schema({
+    username: String,
+    age: Number
 });
 
-const farmSchema = new Schema({
-    name: String,
-    city: String,
-    products: [
-        // This indicates here we have one to Many relationship
-        { type: Schema.Types.ObjectId, ref: 'Product' }
-    ]
+const tweetSchema = new Schema({
+    text: String,
+    likes: Number,
+    user: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
-const Product = mongoose.model('Product', productSchema);
-const Farm = mongoose.model('Farm', farmSchema);
+const User = mongoose.model('User', userSchema);
+const Tweet = mongoose.model('Tweet', tweetSchema);
 
-// Product.insertMany([
-//     { name: 'Goddess Melon', price: 4.99, season: 'Summer' },
-//     { name: 'Sugar Baby Watermelon', price: 2.99, season: 'Summer' },
-//     { name: 'Asparagus', price: 3.99, season: 'Spring' }
-// ]);
+// const makeTweets = async () => {
+//     // const user = new User({
+//     //     username: 'genesis',
+//     //     age: 26
+//     // });
 
-// const makeFarm = async () => {
-//     const farm = new Farm({ name: 'Fully Belly Farms', city: 'Guinda CA' });
-//     const melon = await Product.findOne({ name: 'Goddess Melon' });
-//     farm.products.push(melon);
-//     await farm.save();
-//     console.log("Farm: ", farm);
+//     const user = await User.findOne({ username: 'genesis' });
+//     const tweet2 = new Tweet({
+//         text: 'Genesissssss successfullllll',
+//         likes: 13217
+//     });
+
+//     tweet2.user = user;
+//     await tweet2.save();
+//     console.log("tweet2 saved!");
 // }
+// makeTweets();
 
-// makeFarm();
+const findTweet = async () => {
+    const t = await Tweet.find({})
+    // Populate the user field but only give me the 'name'
+    .populate('user', 'username');
+    console.log(t);
+}
 
-// const addProduct = async () => {
-//     const farm = await Farm.findOne({ name: 'Fully Belly Farms' });
-//     const watermelon = await Product.findOne({ name: 'Sugar Baby Watermelon' });
-//     farm.products.push(watermelon);
-//     await farm.save();
-//     console.log(farm);
-// }
-
-// addProduct();
-
-Farm.findOne({ name: 'Fully Belly Farms' })
-    // Will replace the ids with the original objects and will return them
-    .populate('products') // Populate the products array
-    .then((farm) => {
-        console.log("Farm: ", farm);
-    })
+findTweet();
