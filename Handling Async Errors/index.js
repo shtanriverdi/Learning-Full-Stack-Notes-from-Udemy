@@ -5,9 +5,10 @@ const path = require('path');
 const mongoose = require('mongoose');
 const Product = require('./models/product');
 const methodOverride = require('method-override');
+const AppError = require('./AppError');
 
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/farmStand');
+    await mongoose.connect('mongodb://127.0.0.1:27017/farmStand2');
     console.log('Mongo connection opened ✓');
 }
 
@@ -54,43 +55,58 @@ app.use(methodOverride('_method'));
 
 const categories = ['fruit', 'vegetable', 'dairy', 'fungi'];
 
+function wrapAsync(fn) {
+    return function (req, res, next) {
+        fn(req, res, next).catch(err => next(err))
+    }
+}
+
 app.delete('/products/:id', async (req, res) => {
     const { id } = req.params;
     const deletedProduct = await Product.findByIdAndDelete(id);
     res.redirect(`/products`);
 });
 
-app.put('/products/:id', async (req, res) => {
-    console.log(req.body, req.params);
+app.put('/products/:id', wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const editedProduct = req.body;
     const updatedProduct = await Product.findByIdAndUpdate(id, editedProduct, { runValidators: true, new: true });
     res.redirect(`/products/${updatedProduct._id}`);
-});
+}));
 
-app.get('/products/:id/edit', async (req, res) => {
+app.get('/products/:id/edit', wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const product = await Product.findById(id);
+    if (!product) {
+        throw new AppError('Product not found!', 404);
+    }
     res.render('products/edit', { product, categories });
-});
+}));
 
-app.post('/products', async (req, res) => {
+app.post('/products', wrapAsync(async (req, res, next) => {
     const newProduct = new Product(req.body);
     await newProduct.save();
     res.redirect(`/products/${newProduct._id}`);
-});
+}));
 
 app.get('/products/new', (req, res) => {
+    // throw new AppError('Now Allowed', 401);
     res.render('products/new', { categories });
 });
 
-app.get('/products/:id', async (req, res) => {
-    const { id } = req.params;
-    const product = await Product.findById(id);
-    res.render('products/show', { product });
-});
+app.get('/products/:id', wrapAsync(
+    async (req, res, next) => {
+        const { id } = req.params;
+        const product = await Product.findById(id);
+        if (!product) {
+            throw new AppError('Product not found!', 404);
+        }
+        res.render('products/show', { product });
+        next(error);
+    }
+));
 
-app.get('/products', async (req, res) => {
+app.get('/products', wrapAsync(async (req, res, next) => {
     const { category } = req.query;
     let products;
     if (category) {
@@ -99,4 +115,32 @@ app.get('/products', async (req, res) => {
         products = await Product.find({});
     }
     res.render('products/index', { products, category });
-});
+}));
+
+const hadleValidationError = err => {
+    console.log(err);
+    return new AppError(`Validation failed ${err.message}`, 400);
+}
+
+const hadleCastError = err => {
+    console.log(err);
+    return err
+}
+
+// Error Handling
+app.use((err, req, res, next) => {
+    console.log(err.name);
+    if (err.name === 'ValidationError') {
+        err = hadleValidationError(err);
+    }
+    if (err.name === 'CastError') {
+        err = hadleCastError(err);
+    }
+    next(err);
+})
+
+
+app.use((err, req, res, next) => {
+    const { status = 500, message = 'Something wrong!' } = err;
+    res.status(status).send(message);
+})
