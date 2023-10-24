@@ -76,8 +76,7 @@ app.get('/farms/:id', async (req, res) => {
 
 app.delete('/farms/:id', async (req, res) => {
     const { id: farm_id } = req.params;
-    console.log("DELETING", farm_id);
-    // const deletedFarm = await Farm.findByIdAndDelete(farm_id);
+    const deletedFarm = await Farm.findByIdAndDelete(farm_id);
     res.redirect('/farms');
 });
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Product = require('./product');
 const { Schema } = mongoose;
 
 const farmScheme = new Schema({
@@ -33,14 +34,23 @@ products of a farm after a farm is deleted.
 We used "findByIdAndDelete" so according to Mongoose Docs this will
 trigger "findOneAndDelete" middleware that's why we will use that here.
 */ 
-farmScheme.pre('findOneAndDelete', async function (data) {
-    console.log("PRE Middleware");
-    console.log(data);
-});
 
-farmScheme.post('findOneAndDelete', async function (data) {
-    console.log("POST Middleware");
-    console.log(data);
+// This is running before we run the query of "findByIdAndDelete"
+// We don't have access the "data"
+// farmScheme.pre('findOneAndDelete', async function (data) {
+//     console.log("PRE Middleware");
+//     console.log(data);
+// });
+
+// This is running after we run the query of "findByIdAndDelete"
+// We have access the "data" after the farm is deleted
+farmScheme.post('findOneAndDelete', async function (farmDeleted) {
+    // Remove all the associated products: products: [ 12231, 12214, 123321... ] 
+    if (farmDeleted.products.length) {
+        // Delete all products whether their id is in farm.products
+        const res = await Product.deleteMany({ _id: { $in: farmDeleted.products } });
+        // console.log("Result: ", res);
+    }
 });
 
 
