@@ -4,15 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= farm.name %></title>
+    <title>
+        <%= farm.name %>
+    </title>
 </head>
 
 <body>
-    <h1><%= farm.name %></h1>
+    <h1>
+        <%= farm.name %>
+    </h1>
     <ul>
-        <li><span>City: </span><b><%= farm.city %></b></li>
-        <li><span>Email: </span><b><%= farm.email %></b></li>
+        <li><span>City: </span><b>
+                <%= farm.city %>
+            </b></li>
+        <li><span>Email: </span><b>
+                <%= farm.email %>
+            </b></li>
     </ul>
-    <a href="/farms">Go Back To All Farms</a>
+
+    <h2>Products</h2>
+    <ul>
+        <% for (let product of farm.products) { %>
+            <li><a href="/products/<%= product._id %>">
+                    <%= product.name %>
+                </a></li>
+            <% } %>
+    </ul>
+
+    <a href="/farms/<%= farm._id %>/products/new">Add Product</a>
+    <a href="/farms">Go Back To Main Page</a>
+    <form action="/farms/<%= farm._id %>?_method=DELETE" method="POST">
+        <button type="submit">Delete The FARM</button>
+    </form>
 </body>
+
 </html>

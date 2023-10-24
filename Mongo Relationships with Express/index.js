@@ -70,9 +70,16 @@ app.get('/farms/new', (req, res) => {
 
 app.get('/farms/:id', async (req, res) => {
     const { id } = req.params;
-    const farm = await Farm.findById(id);
+    const farm = await Farm.findById(id).populate('products');
     res.render('farms/show', { farm });
-})
+});
+
+app.delete('/farms/:id', async (req, res) => {
+    const { id: farm_id } = req.params;
+    console.log("DELETING", farm_id);
+    // const deletedFarm = await Farm.findByIdAndDelete(farm_id);
+    res.redirect('/farms');
+});
 
 app.post('/farms', async (req, res) => {
     const farm = new Farm(req.body);
@@ -80,11 +87,29 @@ app.post('/farms', async (req, res) => {
     res.redirect('/farms');
 });
 
-app.get('/farms/:id/products/new', (req, res) => {
-    const { id } = req.params;
-    res.render('products/new', { categories, id });
+app.get('/farms/:farm_id/products/new', async (req, res) => {
+    const { farm_id } = req.params;
+    const farm = await Farm.findById(farm_id);
+    res.render('products/new', { categories, farm });
 });
 
+app.post('/farms/:farm_id/products', async (req, res) => {
+    // Create a product model
+    const { name, price, category } = req.body;
+    const product = new Product({ name, price, category });
+    
+    // Find the farm and associate the product
+    const farm_id = req.params.farm_id;
+    const farm = await Farm.findById(farm_id);
+    farm.products.push( product );
+    product.farm = farm;
+    
+    // Save the product and farm
+    await farm.save();
+    await product.save();
+
+    res.redirect(`/farms/${farm_id}`);
+})
 
 
 
@@ -92,11 +117,6 @@ app.get('/farms/:id/products/new', (req, res) => {
 
 
 // PRODUCT ROUTES
-
-
-
-
-
 const categories = ['fruit', 'vegetable', 'dairy', 'fungi'];
 
 app.delete('/products/:id', async (req, res) => {
@@ -131,7 +151,8 @@ app.get('/products/new', (req, res) => {
 
 app.get('/products/:id', async (req, res) => {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate('farm', 'name');
+    console.log(product);
     res.render('products/show', { product });
 });
 

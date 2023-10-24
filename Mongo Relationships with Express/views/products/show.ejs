@@ -10,6 +10,7 @@
 <body>
     <h1><%= product.name %></h1>
     <ul>
+        <h3>From <a href="/farms/<%= product.farm._id %>"><%= product.farm.name %></a></h3>
         <li>Price: <%= product.price %>$</li>
         <li>Category: <a href="/products?category=<%= product.category %>"><%= product.category %></a></li>
     </ul>
