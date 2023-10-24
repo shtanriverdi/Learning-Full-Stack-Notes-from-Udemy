@@ -4,10 +4,11 @@ const port = 3000;
 const path = require('path');
 const mongoose = require('mongoose');
 const Product = require('./models/product');
+const Farm = require('./models/farm');
 const methodOverride = require('method-override');
 
 async function main() {
-    await mongoose.connect('mongodb://127.0.0.1:27017/farmStand');
+    await mongoose.connect('mongodb://127.0.0.1:27017/farmStand2');
     console.log('Mongo connection opened ✓');
 }
 
@@ -51,6 +52,50 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 // Since Form cannot do PUT request, we use method override here
 // to convert/pretent default form method POST
+
+
+
+
+
+// FARM ROUTES
+
+app.get('/farms', async (req, res) => {
+    const farms = await Farm.find();
+    res.render('farms/index', { farms });
+});
+
+app.get('/farms/new', (req, res) => {
+    res.render('farms/new');
+});
+
+app.get('/farms/:id', async (req, res) => {
+    const { id } = req.params;
+    const farm = await Farm.findById(id);
+    res.render('farms/show', { farm });
+})
+
+app.post('/farms', async (req, res) => {
+    const farm = new Farm(req.body);
+    await farm.save();
+    res.redirect('/farms');
+});
+
+app.get('/farms/:id/products/new', (req, res) => {
+    const { id } = req.params;
+    res.render('products/new', { categories, id });
+});
+
+
+
+
+
+
+
+// PRODUCT ROUTES
+
+
+
+
 
 const categories = ['fruit', 'vegetable', 'dairy', 'fungi'];
 
