@@ -26,6 +26,7 @@ const farmSchema = new Schema({
     city: String,
     products: [
         // This indicates here we have one to Many relationship
+        // One Farm can have many products
         { type: Schema.Types.ObjectId, ref: 'Product' }
     ]
 });
