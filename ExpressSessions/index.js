@@ -19,11 +19,34 @@ app.get('/viewcount', (req, res) => {
         We can add anything we want to "req.session",
         That data in session is stored server side
         and it is associated with individual users or 
-        at least individual browsers
+        individual browsers
+
+        Currently, the default server-side session store
+        is using "MemoryStore" which is in Memory and for development
+        and debugging purposes also may lead memory leaks!,
+        we won't do that for Production!
+
+        For Production, we will use a session store like "REDIS"
+
+        Having a cookie that is sent to user's browser, 
+        in that cookie does not contain any of these information
+        in this session! like "req.session.count"!
+
+        A session can store a whole lot more information but cookie cant.
+
+        The only information cookie sends to User is "connect.sid" which
+        is the session id itself that help connects and associated the
+        server side with the user's browser, it is like a bridge.
+
+        On the express side, that express-session package takes that cookie
+        If it is there, and it's going to make sure it is still valid
+        And tries to find the information that corresponds to that session id
+        If it does, that's what we have access to "req.session"
     */
     if (req.session.count) {
         req.session.count += 1;
     }
+    // First time we hit, it doesn't exist
     else {
         req.session.count = 1;
     }
