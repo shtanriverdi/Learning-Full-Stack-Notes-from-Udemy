@@ -4,6 +4,9 @@
     We don't use cookies to store information!
     We use them to add some statefullness between requests
     Places we use cookies like: Sessions, SignIn, TrackingData
+    Cookies has limitations and Client Side as well as Server Side:
+    - Number of cookies per domain: 50
+    - 4093 Bytes per domain, size of all cookies should not exceed.
 */
 
 const express = require('express');
