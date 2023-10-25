@@ -6,7 +6,7 @@ const router = express.Router();
 // We already get that prefix part from the 'index.js' page
 // So we can just continue writing our routes for the rest of the URL
 // '/shelters/....'
-//           ^____^ 
+//           ^____^ -> we edit this part here
 
 router.get('/', (req, res) => {
     res.send('All Shelters');
