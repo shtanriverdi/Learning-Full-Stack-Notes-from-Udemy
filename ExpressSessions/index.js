@@ -7,12 +7,18 @@ Create a session, the most important part is secret
 In production, we want it to be a actual secret key
 Everytime in our request object, we will have access to session propery
 */
-app.use(session({ secret: 'thisisnotagoodsecret' }));
+const sessionOptions = { secret: 'thisisnotagoodsecret', resave: false, saveUninitialized: false };
+app.use(session(sessionOptions));
 
 /*
     If a user opens this page, "connect.sid" will be assined to that user.
     So that we can store little info in it. Browser automatically sends.
-    For every browser or user, session will be created
+    For every browser or user, session will be created.
+
+    Cooikes are used as a transfert tool to transfer the session id
+
+    Cookies can me modified by the client, that's why they cannot be trusted
+    by the server side.
 */
 app.get('/viewcount', (req, res) => {
     /* 
@@ -26,7 +32,8 @@ app.get('/viewcount', (req, res) => {
         and debugging purposes also may lead memory leaks!,
         we won't do that for Production!
 
-        For Production, we will use a session store like "REDIS"
+        For Production, we will use a session store like "REDIS",
+        So this will be stored in a local memory not in actual persistent store like mongo
 
         Having a cookie that is sent to user's browser, 
         in that cookie does not contain any of these information
@@ -50,7 +57,18 @@ app.get('/viewcount', (req, res) => {
     else {
         req.session.count = 1;
     }
-    res.send(`You have viewed this page ${ req.session.count } times`);
+    res.send(`You have viewed this page ${req.session.count} times`);
+})
+
+app.get('/register', (req, res) => {
+    const { username = 'Anonymous' } = req.query;
+    req.session.username = username;
+    res.redirect('/greet');
+})
+
+app.get('/greet', (req, res) => {
+    const { username } = req.session;
+    res.send(`Welcome back ${username}`);
 })
 
 app.listen(3000, () => {
