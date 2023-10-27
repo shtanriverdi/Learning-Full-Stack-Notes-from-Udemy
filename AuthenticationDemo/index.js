@@ -4,6 +4,7 @@ const app = express();
 const User = require('./models/user');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const session = require('express-session');
 
 mongoose.connect('mongodb://127.0.0.1:27017/authDemo')
     .then(() => {
@@ -18,6 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // POST Body parser middleware
 app.use(express.urlencoded({ urlencoded: true, extended: true }));
+app.use(session({ secret: 'notagoodsecret' }));
 
 app.get('/', (req, res) => {
     res.send('Home Page');
