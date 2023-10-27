@@ -22,6 +22,13 @@ app.use(express.urlencoded({ urlencoded: true, extended: true }));
 // connect.sid will be automaticallt sent to the client/user
 app.use(session({ secret: 'notagoodsecret' }));
 
+const requireLogin = (req, res, next) => {
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    next();
+}
+
 app.get('/', (req, res) => {
     res.send('Home Page');
 })
@@ -51,7 +58,7 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-    const { username, password }= req.body;
+    const { username, password } = req.body;
     const user = await User.findOne({ username });
     console.log("user: ", user);
     if (!user) {
@@ -69,14 +76,26 @@ app.post('/login', async (req, res) => {
     }
 })
 
-app.get('/secret', (req, res) => {
-    // To see all Session Info
-    // console.log(req.sessionStore.sessions);
-    // If there is not a user id in this session
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-    res.send('You cant see mee');
+app.post('/logout', (req, res) => {
+    // req.session.user_id = null;
+    console.log("Before Session Destroyed: ", req.sessionStore.sessions);
+    req.session.destroy(); // gets rid of everything
+    console.log("After Session Destroyed: ", req.sessionStore.sessions);
+    res.redirect('/login');
+})
+
+app.get('/secret', requireLogin, (req, res) => {
+    // // To see all Session Info
+    // // console.log(req.sessionStore.sessions);
+    // // If there is not a user id in this session
+    // if (!req.session.user_id) {
+    //     return res.redirect('/login');
+    // }
+    res.render('secret');
+})
+
+app.get('/topsecret', requireLogin, (req, res) => {
+    res.render('secret');
 })
 
 app.listen(3000, () => {
