@@ -39,11 +39,7 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    const hash = await bcrypt.hash(password, 12);
-    const user = new User({
-        username,
-        hashedPassword: hash
-    });
+    const user = new User({ username, hashedPassword: password });
     await user.save();
     req.session.user_id = user._id;
     res.redirect('/');
@@ -59,17 +55,11 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    console.log("user: ", user);
-    if (!user) {
-        return res.redirect('/login');
-    }
-    const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
-    if (isValidPassword) {
+    const foundUser = await User.findAndValidateUser(username, password);
+    if (foundUser) {
         // If a user successfully logged in, 
         // We store user's id in the session
-        req.session.user_id = user._id;
-
+        req.session.user_id = foundUser._id;
         res.redirect('/secret');
     } else {
         res.redirect('/login');
