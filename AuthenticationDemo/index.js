@@ -19,6 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // POST Body parser middleware
 app.use(express.urlencoded({ urlencoded: true, extended: true }));
+// connect.sid will be automaticallt sent to the client/user
 app.use(session({ secret: 'notagoodsecret' }));
 
 app.get('/', (req, res) => {
@@ -37,6 +38,7 @@ app.post('/register', async (req, res) => {
         hashedPassword: hash
     });
     await user.save();
+    req.session.user_id = user._id;
     res.redirect('/');
 })
 
@@ -49,13 +51,20 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ username });
     const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
     if (isValidPassword) {
-        res.send(`Welcome! ${username}`);
+        // If a user successfully logged in, 
+        // We store user's id in the session
+        req.session.user_id = user._id;
+        res.redirect('/secret');
     } else {
-        res.send("Try Again :(");
+        res.redirect('/login');
     }
 })
 
 app.get('/secret', (req, res) => {
+    // If there is not a user id in this session
+    if (!req.session.user_id) {
+        return res.redirect('/login');
+    }
     res.send('You cant see mee');
 })
 
