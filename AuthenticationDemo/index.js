@@ -43,17 +43,26 @@ app.post('/register', async (req, res) => {
 })
 
 app.get('/login', (req, res) => {
+    // If user already logged in, redirect them
+    if (req.session.user_id) {
+        return res.redirect('/secret');
+    }
     res.render('login');
 })
 
 app.post('/login', async (req, res) => {
     const { username, password }= req.body;
     const user = await User.findOne({ username });
+    console.log("user: ", user);
+    if (!user) {
+        return res.redirect('/login');
+    }
     const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
     if (isValidPassword) {
         // If a user successfully logged in, 
         // We store user's id in the session
         req.session.user_id = user._id;
+
         res.redirect('/secret');
     } else {
         res.redirect('/login');
@@ -61,6 +70,8 @@ app.post('/login', async (req, res) => {
 })
 
 app.get('/secret', (req, res) => {
+    // To see all Session Info
+    // console.log(req.sessionStore.sessions);
     // If there is not a user id in this session
     if (!req.session.user_id) {
         return res.redirect('/login');
